@@ -23,6 +23,11 @@ export default function AppNavbar() {
             <Nav.Link as={NavLink} to="/register">
               Register
             </Nav.Link>
+            
+            <Nav.Link as={NavLink} to="/advisor/slots">
+            Advisor Slots
+            </Nav.Link>
+
           </Nav>
         </Navbar.Collapse>
       </Container>
