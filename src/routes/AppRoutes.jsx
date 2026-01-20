@@ -1,97 +1,63 @@
 import { Routes, Route } from "react-router-dom";
 
-// Public pages
+import PublicLayout from "../layouts/PublicLayout";
+import StudentLayout from "../layouts/StudentLayout";
+import AdvisorLayout from "../layouts/AdvisorLayout";
+
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import NotFound from "../pages/NotFound";
 
-// Student pages
 import FindAppointments from "../pages/FindAppointments";
 import MyAppointments from "../pages/MyAppointments";
 
-// Advisor pages
-import AdvisorLayout from "../layouts/AdvisorLayout";
 import Dashboard from "../pages/Dashboard";
-import ManageSlots from "../pages/ManageSlots";
+import AdvisorSlots from "../pages/AdvisorSlots";
 import AdvisorAppointments from "../pages/AdvisorAppointments";
 
-
-// Navbar
-import StudentNavbar from "../components/StudentNavbar";
-
-// Route protection
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ===== Public Routes ===== */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* ========== PUBLIC ========== */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
-      {/* ===== Student Routes ===== */}
+      {/* ========== STUDENT ========== */}
       <Route
-        path="/student/find"
         element={
           <ProtectedRoute role="student">
-            <>
-              <StudentNavbar />
-              <FindAppointments />
-            </>
+            <StudentLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="/student/find" element={<FindAppointments />} />
+        <Route path="/student/my" element={<MyAppointments />} />
+      </Route>
 
+      {/* ========== ADVISOR ========== */}
       <Route
-        path="/student/my"
         element={
-          <ProtectedRoute role="student">
-            <>
-              <StudentNavbar />
-              <MyAppointments />
-            </>
+          <ProtectedRoute role="advisor">
+            <AdvisorLayout />
           </ProtectedRoute>
         }
-      />
-
-      {/* ===== Not Found ===== */}
-      <Route path="*" element={<NotFound />} />
-
+      >
+        <Route path="/advisor/dashboard" element={<Dashboard />} />
+        <Route path="/advisor/slots" element={<AdvisorSlots />} />
         <Route
-  path="/advisor/dashboard"
-  element={
-    <ProtectedRoute role="advisor">
-      <AdvisorLayout>
-        <Dashboard />
-      </AdvisorLayout>
-    </ProtectedRoute>
-  }
-/>
+          path="/advisor/appointments"
+          element={<AdvisorAppointments />}
+        />
+      </Route>
 
-<Route
-  path="/advisor/slots"
-  element={
-    <ProtectedRoute role="advisor">
-      <AdvisorLayout>
-        <ManageSlots />
-      </AdvisorLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/advisor/appointments"
-  element={
-    <ProtectedRoute role="advisor">
-      <AdvisorLayout>
-        <AdvisorAppointments />
-      </AdvisorLayout>
-    </ProtectedRoute>
-  }
-/>
-
+      {/* ========== 404 ========== */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

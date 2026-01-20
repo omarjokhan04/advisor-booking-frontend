@@ -1,0 +1,88 @@
+/* ================= PAGE ================= */
+.find-page {
+  background: #f6fbff;
+  min-height: calc(100vh - 70px);
+  padding: 26px 0 70px;
+}
+
+.find-container {
+  max-width: 1200px;
+}
+
+/* ================= HEADER ================= */
+.find-header {
+  margin-bottom: 18px;
+}
+
+.find-title {
+  font-size: 38px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.find-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ================= FILTER ================= */
+.find-filter-card {
+    margin-bottom: 32px;
+  border: 1px solid #e9eef5;
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+  margin-top: 18px;
+}
+
+.find-filter-body {
+  padding: 22px;
+}
+
+.find-filter-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 16px;
+  color: #0f172a;
+}
+
+.find-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.find-input {
+  border-radius: 12px;
+  height: 44px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+/* ================= GRID ================= */
+.find-grid {
+  margin-top: 22px;
+}
+
+/* Empty state */
+.find-empty {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .find-title {
+    font-size: 28px;
+  }
+
+  .find-filter-body {
+    padding: 18px;
+  }
+}

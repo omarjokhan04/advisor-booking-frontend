@@ -1,0 +1,200 @@
+/* ================= BASE ================= */
+.home-page {
+  width: 100%;
+  background: #ffffff;
+}
+
+/* ================= HERO ================= */
+.home-hero {
+  background: linear-gradient(to bottom, #f6fbff 0%, #ffffff 100%);
+  padding: 60px 0 80px;
+  border-bottom: 1px solid #eaf2fb;
+}
+
+/* Make hero row vertically centered and balanced */
+.home-hero .row {
+  min-height: 520px;
+  align-items: center;
+}
+
+.home-title {
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1.12;
+  margin-bottom: 16px;
+  color: #0f172a;
+}
+
+.home-description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #64748b;
+  margin-bottom: 22px;
+  max-width: 520px;
+}
+
+.home-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.home-primary-btn {
+  padding: 10px 18px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+/* Image on the right like the screenshot */
+.home-image-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.home-hero-image {
+  width: 100%;
+  max-width: 560px;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+/* ================= WHY USE ================= */
+.home-why {
+  padding: 75px 0 85px;
+  background: #ffffff;
+}
+
+.home-section-header {
+  text-align: center;
+  margin-bottom: 38px;
+}
+
+.home-section-header h2 {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.home-section-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 auto;
+  max-width: 620px;
+}
+
+/* Card style like screenshot */
+.home-feature-card {
+  border: 1px solid #e9eef5;
+  border-radius: 12px;
+  background: #ffffff;
+  height: 100%;
+  padding: 18px 16px 10px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.10);
+}
+
+.home-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #eef6ff;
+  color: #0d6efd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.home-feature-card .card-title {
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.home-feature-card .card-text {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.65;
+}
+
+/* ================= CTA ================= */
+.home-cta {
+  padding: 80px 0 90px;
+  background: #f6fbff;
+  border-top: 1px solid #eaf2fb;
+  text-align: center;
+}
+
+.home-cta h2 {
+  font-size: 28px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.home-cta p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 auto 22px;
+  max-width: 560px;
+}
+
+.home-cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 991px) {
+  .home-hero {
+    padding: 40px 0 60px;
+  }
+
+  .home-hero .row {
+    min-height: auto;
+  }
+
+  .home-title {
+    font-size: 34px;
+    text-align: center;
+  }
+
+  .home-description {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .home-actions {
+    justify-content: center;
+  }
+
+  .home-image-wrapper {
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  .home-hero-image {
+    max-width: 100%;
+    height: 260px;
+  }
+
+  .home-cta-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-cta-actions .btn {
+    width: 240px;
+  }
+}

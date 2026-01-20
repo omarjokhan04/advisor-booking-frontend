@@ -1,33 +1,39 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { Container, Nav, Navbar, Button } from "react-bootstrap";
+import { Link, NavLink } from "react-router-dom";
+import { FaGraduationCap } from "react-icons/fa";
+import "../css/AppNavbar.css";
 
 export default function AppNavbar() {
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+    <Navbar className="app-navbar" expand="md">
       <Container>
-        <Navbar.Brand as={NavLink} to="/">
-          Advisor Booking
+        {/* Logo */}
+        <Navbar.Brand as={Link} to="/" className="app-navbar-brand">
+          <span className="app-navbar-logo">
+            <FaGraduationCap />
+          </span>
+          <span className="app-navbar-title">University Advisor</span>
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="main-navbar" />
-        <Navbar.Collapse id="main-navbar">
-          <Nav className="ms-auto">
-            <Nav.Link as={NavLink} to="/" end>
+        <Navbar.Toggle />
+
+        <Navbar.Collapse className="justify-content-end">
+          <Nav className="app-navbar-links">
+            <NavLink to="/" className="nav-link">
               Home
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link as={NavLink} to="/login">
+            <NavLink to="/student/find" className="nav-link">
+              Book Appointment
+            </NavLink>
+
+            <Button
+              as={Link}
+              to="/login"
+              className="app-navbar-login-btn"
+            >
               Login
-            </Nav.Link>
-
-            <Nav.Link as={NavLink} to="/register">
-              Register
-            </Nav.Link>
-            
-            <Nav.Link as={NavLink} to="/advisor/slots">
-            Advisor Slots
-            </Nav.Link>
-
+            </Button>
           </Nav>
         </Navbar.Collapse>
       </Container>

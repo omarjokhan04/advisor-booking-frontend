@@ -1,0 +1,152 @@
+/* Page background like the design */
+.myap-page {
+  background: #f6fbff;
+  min-height: calc(100vh - 70px);
+  padding: 22px 0 40px;
+}
+
+.myap-container {
+  max-width: 1200px;
+}
+
+/* Title + subtitle */
+.myap-title {
+  font-size: 44px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.myap-subtitle {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0 0 26px;
+}
+
+/* List */
+.myap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Card */
+.myap-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.myap-card-body {
+  padding: 22px;
+}
+
+/* Header row: left text + right status badge */
+.myap-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.myap-advisor {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Details lines */
+.myap-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myap-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #475569;
+  font-size: 16px;
+}
+
+.myap-ico {
+  color: #64748b;
+  font-size: 18px;
+}
+
+/* Actions: keep cancel on the right like the reference */
+.myap-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.myap-cancel-btn {
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.myap-cancel-ico {
+  font-size: 16px;
+}
+
+/* ✅ Status badge style like your screenshot */
+.status-badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* Booked = light blue pill */
+.status-badge.booked {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+/* Completed = light green pill */
+.status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+/* Canceled = light red pill */
+.status-badge.canceled {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .myap-title {
+    font-size: 34px;
+  }
+
+  .myap-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .myap-actions {
+    justify-content: flex-start;
+  }
+
+  .myap-cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

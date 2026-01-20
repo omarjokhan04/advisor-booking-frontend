@@ -1,0 +1,77 @@
+/* ================= NAVBAR BASE ================= */
+.student-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #eaf2fb;
+  padding: 10px 0;
+}
+
+/* ================= BRAND ================= */
+.student-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.student-navbar-logo {
+  width: 34px;
+  height: 34px;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.student-navbar-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ================= LINKS ================= */
+.student-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.student-navbar-links .nav-link {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+  padding: 0;
+}
+
+.student-navbar-links .nav-link.active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* ================= LOGOUT BUTTON ================= */
+.student-navbar-logout-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.student-navbar-logout-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .student-navbar-links {
+    gap: 14px;
+    margin-top: 12px;
+    align-items: flex-start;
+  }
+}

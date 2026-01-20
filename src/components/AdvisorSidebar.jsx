@@ -1,58 +1,70 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
 import { clearRole } from "../utils/auth";
-
-const linkClass = ({ isActive }) =>
-  `d-block px-3 py-2 rounded text-decoration-none ${
-    isActive ? "bg-primary text-white" : "text-dark"
-  }`;
+import { FiLogOut } from "react-icons/fi";
+import { FiGrid, FiCalendar, FiUsers } from "react-icons/fi";
+import { FaGraduationCap } from "react-icons/fa";
+import "../css/AdvisorSidebar.css";
 
 export default function AdvisorSidebar() {
   const navigate = useNavigate();
 
-  function handleLogout() {
+  function logout() {
     clearRole();
     navigate("/");
   }
 
+  const linkClass = ({ isActive }) =>
+    `asb-link ${isActive ? "asb-link-active" : ""}`;
+
   return (
-    <div
-      className="border-end bg-white"
-      style={{ width: 260, minHeight: "100vh", padding: 16 }}
-    >
-      <div className="mb-4">
-        <div className="fw-bold">Advisor Portal</div>
-        <div className="text-muted" style={{ fontSize: 13 }}>
-          University Advisor
+    <aside className="asb">
+      {/* Top: Logo + Title */}
+      <div className="asb-top">
+        <div className="asb-logo">
+          <FaGraduationCap />
+        </div>
+        <div>
+          <div className="asb-title">Advisor Portal</div>
         </div>
       </div>
 
-      <div className="p-3 bg-light rounded mb-4">
-        <div className="text-muted" style={{ fontSize: 13 }}>
-          Welcome,
-        </div>
-        <div className="fw-bold">Advisor</div>
+      {/* Welcome */}
+      <div className="asb-welcome">
+        <div className="asb-welcome-muted">Welcome,</div>
+        <div className="asb-welcome-name">Dr. Sarah Johnson</div>
       </div>
 
-      <div className="d-grid gap-2">
+      {/* Nav */}
+      <nav className="asb-nav">
         <NavLink to="/advisor/dashboard" className={linkClass}>
-          📊 Dashboard
+          <span className="asb-icon">
+            <FiGrid />
+          </span>
+          <span>Dashboard</span>
         </NavLink>
 
         <NavLink to="/advisor/slots" className={linkClass}>
-          🗓️ Manage Slots
+          <span className="asb-icon">
+            <FiCalendar />
+          </span>
+          <span>Manage Slots</span>
         </NavLink>
 
         <NavLink to="/advisor/appointments" className={linkClass}>
-          👥 Appointments
+          <span className="asb-icon">
+            <FiUsers />
+          </span>
+          <span>Appointments</span>
         </NavLink>
-      </div>
+      </nav>
 
-      <div className="mt-auto" style={{ position: "absolute", bottom: 16, width: 228 }}>
-        <Button variant="outline-primary" className="w-100" onClick={handleLogout}>
-          Logout
-        </Button>
+      {/* Bottom */}
+      <div className="asb-bottom">
+        <button type="button" className="asb-logout" onClick={logout}>
+          <FiLogOut />
+          <span>Logout</span>
+        </button>
       </div>
-    </div>
+    </aside>
   );
 }

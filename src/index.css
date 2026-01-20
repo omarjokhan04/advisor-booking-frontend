@@ -1,4 +1,5 @@
 :root {
+  
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -12,6 +13,33 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* makes your routes take the available height so footer stays bottom */
+.app-wrapper > *:first-child {
+  flex: 1;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+}
+
+
 
 a {
   font-weight: 500;

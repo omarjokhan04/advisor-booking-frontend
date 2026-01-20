@@ -1,0 +1,10 @@
+.advisor-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f6fbff;
+}
+
+.advisor-content {
+  flex: 1;
+  padding: 24px;
+}

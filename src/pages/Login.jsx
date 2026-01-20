@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { setRole } from "../utils/auth";
+//import AppNavbar from "../components/AppNavbar";
+import "../css/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -40,57 +42,65 @@ export default function Login() {
   }
 
   return (
-    <Container className="py-5" style={{ maxWidth: 520 }}>
-      <Card className="p-4 shadow-sm">
-        <h2 className="text-center mb-1">Welcome Back</h2>
-        <p className="text-center text-muted mb-4">
-          Sign in to your account to continue
-        </p>
+    <div className="login-page">
+      
 
-        {error && <Alert variant="danger">{error}</Alert>}
+      <main className="login-main">
+        <Container className="login-container">
+          <Card className="login-card">
+            <h2 className="login-title">Welcome Back</h2>
+            <p className="login-subtitle">Sign in to your account to continue</p>
 
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="loginEmail">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              name="email"
-              placeholder="student@university.edu"
-              value={form.email}
-              onChange={handleChange}
-            />
-          </Form.Group>
+            {error && <Alert variant="danger">{error}</Alert>}
 
-          <Form.Group className="mb-3" controlId="loginPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={handleChange}
-            />
-          </Form.Group>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="loginEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  placeholder="student@university.edu"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-          <Button type="submit" className="w-100">
-            Login
-          </Button>
-        </Form>
+              <Form.Group className="mb-3" controlId="loginPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-        <div className="text-center mt-3">
-          <small className="text-muted">
-            Don't have an account? <Link to="/register">Create Account</Link>
-          </small>
-        </div>
+              <Button type="submit" className="w-100">
+                Login
+              </Button>
+            </Form>
 
-        <Card className="mt-4 p-3 bg-light border-0">
-          <strong>Demo Credentials:</strong>
-          <div className="mt-2">
-            <div>Student: <code>student@demo.com</code> / <code>password</code></div>
-            <div>Advisor: <code>advisor@demo.com</code> / <code>password</code></div>
-          </div>
-        </Card>
-      </Card>
-    </Container>
+            <div className="login-footer-text">
+              <small>
+                Don't have an account? <Link to="/register">Create Account</Link>
+              </small>
+            </div>
+
+            <div className="login-demo">
+              <strong>Demo Credentials:</strong>
+              <div className="login-demo-list">
+                <div>
+                  Student: <code>student@demo.com</code> / <code>password</code>
+                </div>
+                <div>
+                  Advisor: <code>advisor@demo.com</code> / <code>password</code>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Container>
+      </main>
+    </div>
   );
 }
