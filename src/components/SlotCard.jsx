@@ -1,25 +1,14 @@
-import { Card, Button, Badge } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
+import "../css/SlotCard.css";
 
-export default function SlotCard({ slot, actionLabel, onAction }) {
+export default function SlotCard() {
   return (
-    <Card className="h-100">
+    <Card className="slot-card">
       <Card.Body>
-        <Card.Title>{slot.advisor}</Card.Title>
-        <Card.Subtitle className="mb-3 text-muted">
-          Academic Advisor
-        </Card.Subtitle>
-
-        <div className="mb-2">📅 {slot.date}</div>
-        <div className="mb-2">⏰ {slot.time}</div>
-        <div className="mb-3">📍 {slot.location}</div>
-
-        <Badge bg="primary" className="mb-3">
-          Available
-        </Badge>
-
-        <Button className="w-100" onClick={() => onAction(slot)}>
-          {actionLabel}
-        </Button>
+        <Card.Title>Dr. Ahmad Saleh</Card.Title>
+        <p>Wed, Jan 15 • 09:00 - 10:00</p>
+        <p>Office 305</p>
+        <Button className="w-100">Book Appointment</Button>
       </Card.Body>
     </Card>
   );

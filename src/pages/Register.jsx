@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+//import AppNavbar from "../components/AppNavbar";
+import "../css/Register.css";
 
 export default function Register() {
   const [form, setForm] = useState({
     fullName: "",
+    studentId: "",
     email: "",
     password: "",
-    role: "student",
+    confirmPassword: "",
   });
 
   const [error, setError] = useState("");
@@ -22,69 +26,115 @@ export default function Register() {
     setError("");
     setSuccess("");
 
-    if (!form.fullName.trim() || !form.email.trim() || !form.password.trim()) {
+    if (
+      !form.fullName.trim() ||
+      !form.studentId.trim() ||
+      !form.email.trim() ||
+      !form.password.trim() ||
+      !form.confirmPassword.trim()
+    ) {
       setError("Please fill in all fields.");
       return;
     }
 
-    // Part 03: no backend yet (we will connect later using axios)
-    setSuccess(`Register submitted as ${form.role} (frontend only).`);
-    // console.log("REGISTER:", form);
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // Frontend only for now
+    setSuccess("Account created (frontend only). You can login now.");
   }
 
   return (
-    <Container className="py-4" style={{ maxWidth: 520 }}>
-      <h1 className="mb-3">Register</h1>
+    <div className="register-page">
+     
 
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
+      <main className="register-main">
+        <Container className="register-container">
+          <Card className="register-card">
+            <h2 className="register-title">Create Account</h2>
+            <p className="register-subtitle">
+              Register as a student to book appointments
+            </p>
 
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="regName">
-          <Form.Label>Full Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="fullName"
-            placeholder="Enter your full name"
-            value={form.fullName}
-            onChange={handleChange}
-          />
-        </Form.Group>
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
 
-        <Form.Group className="mb-3" controlId="regEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            placeholder="name@example.com"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </Form.Group>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="regFullName">
+                <Form.Label>Full Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  value={form.fullName}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-        <Form.Group className="mb-3" controlId="regPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="password"
-            placeholder="Create a password"
-            value={form.password}
-            onChange={handleChange}
-          />
-        </Form.Group>
+              <Form.Group className="mb-3" controlId="regStudentId">
+                <Form.Label>Student ID</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="studentId"
+                  placeholder="STU123456"
+                  value={form.studentId}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-        <Form.Group className="mb-3" controlId="regRole">
-          <Form.Label>Role</Form.Label>
-          <Form.Select name="role" value={form.role} onChange={handleChange}>
-            <option value="student">Student</option>
-            <option value="advisor">Advisor</option>
-          </Form.Select>
-        </Form.Group>
+              <Form.Group className="mb-3" controlId="regEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  placeholder="student@university.edu"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-        <Button type="submit" className="w-100">
-          Create Account
-        </Button>
-      </Form>
-    </Container>
+              <Form.Group className="mb-3" controlId="regPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  placeholder="At least 6 characters"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="regConfirmPassword">
+                <Form.Label>Confirm Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Re-enter your password"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+
+              <Button type="submit" className="w-100">
+                Register
+              </Button>
+            </Form>
+
+            <div className="register-footer-text">
+              <small>
+                Already have an account? <Link to="/login">Login</Link>
+              </small>
+            </div>
+          </Card>
+        </Container>
+      </main>
+    </div>
   );
 }

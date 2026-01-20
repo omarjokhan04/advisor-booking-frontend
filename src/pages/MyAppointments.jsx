@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Container, Card, Button, Badge } from "react-bootstrap";
+import { Container, Card, Button } from "react-bootstrap";
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
+import "../css/MyAppointments.css";
 
 export default function MyAppointments() {
   const [appointments, setAppointments] = useState([
@@ -23,51 +25,66 @@ export default function MyAppointments() {
 
   function cancelAppointment(id) {
     setAppointments((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, status: "Canceled" } : a
-      )
+      prev.map((a) => (a.id === id ? { ...a, status: "Canceled" } : a))
     );
   }
 
   return (
-    <Container className="py-4">
-      <h1 className="mb-1">My Appointments</h1>
-      <p className="text-muted mb-4">
-        View and manage your upcoming and past appointments
-      </p>
+    <div className="myap-page">
+      <Container className="myap-container">
+        <h1 className="myap-title">My Appointments</h1>
+        <p className="myap-subtitle">
+          View and manage your upcoming and past appointments
+        </p>
 
-      {appointments.map((a) => (
-        <Card key={a.id} className="mb-3">
-          <Card.Body>
-            <Card.Title>{a.advisor}</Card.Title>
-            <div className="mb-2">📅 {a.date}</div>
-            <div className="mb-2">⏰ {a.time}</div>
-            <div className="mb-3">📍 {a.location}</div>
+        <div className="myap-list">
+          {appointments.map((a) => (
+            <Card key={a.id} className="myap-card">
+              <Card.Body className="myap-card-body">
+                <div className="myap-card-top">
+                  <div>
+                    <h3 className="myap-advisor">{a.advisor}</h3>
+                  </div>
 
-            <Badge
-              bg={
-                a.status === "Booked"
-                  ? "primary"
-                  : a.status === "Completed"
-                  ? "success"
-                  : "danger"
-              }
-              className="me-3"
-            >
-              {a.status}
-            </Badge>
+                  <span className={`status-badge ${a.status.toLowerCase()}`}>
+                    {a.status}
+                  </span>
+                </div>
 
-            {a.status === "Booked" && (
-              <Button
-                variant="outline-danger"
-                onClick={() => cancelAppointment(a.id)}
-              >
-                Cancel Appointment
-              </Button>
-            )}
-          </Card.Body>
-        </Card>
-      ))}
-    </Container>
+                <div className="myap-details">
+                  <div className="myap-line">
+                    <FaCalendarAlt className="myap-ico" />
+                    <span>{a.date}</span>
+                  </div>
+
+                  <div className="myap-line">
+                    <FaClock className="myap-ico" />
+                    <span>{a.time}</span>
+                  </div>
+
+                  <div className="myap-line">
+                    <FaMapMarkerAlt className="myap-ico" />
+                    <span>{a.location}</span>
+                  </div>
+                </div>
+
+                <div className="myap-actions">
+                  {a.status === "Booked" && (
+                    <Button
+                      variant="danger"
+                      className="myap-cancel-btn"
+                      onClick={() => cancelAppointment(a.id)}
+                    >
+                      <FaTimesCircle className="myap-cancel-ico" />
+                      Cancel Appointment
+                    </Button>
+                  )}
+                </div>
+              </Card.Body>
+            </Card>
+          ))}
+        </div>
+      </Container>
+    </div>
   );
 }

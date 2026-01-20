@@ -1,78 +1,82 @@
 import { Card, Row, Col } from "react-bootstrap";
+import { FaCalendarAlt, FaClock, FaCheckCircle } from "react-icons/fa";
+import "../css/Dashboard.css";
 
 export default function Dashboard() {
+  const recent = [
+    { id: 1, name: "John Smith", date: "1/21/2026 at 09:00", status: "Booked" },
+    { id: 2, name: "John Smith", date: "1/27/2026 at 10:00", status: "Canceled" },
+  ];
+
   return (
-    <>
-      <h1 className="mb-1">Dashboard</h1>
-      <p className="text-muted mb-4">Welcome back, Advisor</p>
+    <div className="dash-page">
+      <h1 className="dash-title">Dashboard</h1>
+      <p className="dash-subtitle">Welcome back, Dr. Sarah Johnson</p>
 
-      <Row className="g-3 mb-4">
+      <Row className="g-3 dash-cards-row">
         <Col md={4}>
-          <Card className="h-100">
-            <Card.Body>
-              <div className="text-muted">Total Slots Created</div>
-              <div className="display-6 fw-bold">12</div>
-              <div className="text-muted">Available time slots</div>
+          <Card className="dash-stat-card">
+            <Card.Body className="dash-stat-body">
+              <div className="dash-stat-top">
+                <div className="dash-stat-label">Total Slots Created</div>
+                <FaCalendarAlt className="dash-stat-icon" />
+              </div>
+
+              <div className="dash-stat-value">3</div>
+              <div className="dash-stat-hint">Available time slots</div>
             </Card.Body>
           </Card>
         </Col>
 
         <Col md={4}>
-          <Card className="h-100">
-            <Card.Body>
-              <div className="text-muted">Today's Appointments</div>
-              <div className="display-6 fw-bold">2</div>
-              <div className="text-muted">Scheduled for today</div>
+          <Card className="dash-stat-card">
+            <Card.Body className="dash-stat-body">
+              <div className="dash-stat-top">
+                <div className="dash-stat-label">Today's Appointments</div>
+                <FaClock className="dash-stat-icon" />
+              </div>
+
+              <div className="dash-stat-value">0</div>
+              <div className="dash-stat-hint">Scheduled for today</div>
             </Card.Body>
           </Card>
         </Col>
 
         <Col md={4}>
-          <Card className="h-100">
-            <Card.Body>
-              <div className="text-muted">Upcoming Appointments</div>
-              <div className="display-6 fw-bold">5</div>
-              <div className="text-muted">Total upcoming</div>
+          <Card className="dash-stat-card">
+            <Card.Body className="dash-stat-body">
+              <div className="dash-stat-top">
+                <div className="dash-stat-label">Upcoming Appointments</div>
+                <FaCheckCircle className="dash-stat-icon" />
+              </div>
+
+              <div className="dash-stat-value">1</div>
+              <div className="dash-stat-hint">Total upcoming</div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      <Card>
-        <Card.Body>
-          <h4 className="mb-3">Recent Appointments</h4>
+      <Card className="dash-recent-card">
+        <Card.Body className="dash-recent-body">
+          <h3 className="dash-recent-title">Recent Appointments</h3>
 
-          <div className="d-flex justify-content-between border-bottom py-2">
-            <div>
-              <div className="fw-bold">Sara Ahmad</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                Wed, Jan 15, 2025 • 09:00 - 10:00
-              </div>
-            </div>
-            <span className="badge bg-primary">Booked</span>
-          </div>
+          <div className="dash-recent-list">
+            {recent.map((r) => (
+              <div key={r.id} className="dash-recent-item">
+                <div className="dash-recent-left">
+                  <div className="dash-recent-name">{r.name}</div>
+                  <div className="dash-recent-date">{r.date}</div>
+                </div>
 
-          <div className="d-flex justify-content-between border-bottom py-2">
-            <div>
-              <div className="fw-bold">Omar Khaled</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                Wed, Jan 15, 2025 • 10:00 - 10:30
+                <span className={`status-badge ${r.status.toLowerCase()}`}>
+                  {r.status}
+                </span>
               </div>
-            </div>
-            <span className="badge bg-primary">Booked</span>
-          </div>
-
-          <div className="d-flex justify-content-between py-2">
-            <div>
-              <div className="fw-bold">Lina Samir</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                Sun, Jan 12, 2025 • 12:00 - 12:30
-              </div>
-            </div>
-            <span className="badge bg-success">Completed</span>
+            ))}
           </div>
         </Card.Body>
       </Card>
-    </>
+    </div>
   );
 }

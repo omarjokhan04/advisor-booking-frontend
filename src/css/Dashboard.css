@@ -1,0 +1,153 @@
+/* Background + spacing */
+.dash-page {
+  background: #f6fbff;
+  padding: 22px 0 40px;
+}
+
+.dash-title {
+  font-size: 44px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: #0f172a;
+}
+
+.dash-subtitle {
+  margin: 0 0 22px;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Cards row */
+.dash-cards-row {
+  margin-bottom: 22px;
+}
+
+/* Stat cards */
+.dash-stat-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.dash-stat-body {
+  padding: 20px 22px;
+}
+
+.dash-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dash-stat-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dash-stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #64748b;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.dash-stat-value {
+  font-size: 44px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.dash-stat-hint {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Recent card */
+.dash-recent-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.dash-recent-body {
+  padding: 22px;
+}
+
+.dash-recent-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 16px;
+}
+
+.dash-recent-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+}
+
+.dash-recent-item + .dash-recent-item {
+  border-top: 1px solid #e5e7eb;
+}
+
+.dash-recent-name {
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.dash-recent-date {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ✅ Same pill badges used everywhere */
+.status-badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.status-badge.booked {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.status-badge.canceled {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dash-title {
+    font-size: 34px;
+  }
+}

@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Card, Button, Badge } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
+import { FiCheckCircle, FiCalendar, FiClock, FiMapPin } from "react-icons/fi";
+import "../css/AdvisorAppointments.css";
 
 export default function AdvisorAppointments() {
   const [items, setItems] = useState([
     {
       id: 1,
       student: "Sara Ahmad",
+      role: "Student",
       date: "Wednesday, January 15, 2025",
       time: "09:00 - 10:00",
       location: "Office 305",
@@ -14,6 +17,7 @@ export default function AdvisorAppointments() {
     {
       id: 2,
       student: "Omar Khaled",
+      role: "Student",
       date: "Wednesday, January 15, 2025",
       time: "10:00 - 10:30",
       location: "Zoom Meeting",
@@ -22,10 +26,11 @@ export default function AdvisorAppointments() {
     {
       id: 3,
       student: "Lina Samir",
+      role: "Student",
       date: "Sunday, January 12, 2025",
       time: "12:00 - 12:30",
       location: "Office 210",
-      status: "Completed",
+      status: "Canceled",
     },
   ]);
 
@@ -35,45 +40,62 @@ export default function AdvisorAppointments() {
     );
   }
 
+  const statusClass = (status) => {
+    if (status === "Booked") return "advapps-status advapps-status-booked";
+    if (status === "Canceled") return "advapps-status advapps-status-canceled";
+    return "advapps-status advapps-status-completed";
+  };
+
   return (
-    <>
-      <h1 className="mb-1">Student Appointments</h1>
-      <p className="text-muted mb-4">
+    <div className="advapps">
+      <h1 className="advapps-title">Student Appointments</h1>
+      <p className="advapps-subtitle">
         View and manage appointments booked by students
       </p>
 
-      {items.map((a) => (
-        <Card key={a.id} className="mb-3">
-          <Card.Body className="d-flex justify-content-between align-items-center">
-            <div>
-              <div className="fw-bold">{a.student}</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                📅 {a.date}
-              </div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                ⏰ {a.time}
-              </div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                📍 {a.location}
-              </div>
-            </div>
+      <div className="advapps-list">
+        {items.map((a) => (
+          <Card key={a.id} className="advapps-card">
+            <Card.Body className="advapps-body">
+              {/* LEFT */}
+              <div className="advapps-left">
+                <div className="advapps-name">{a.student}</div>
+                <div className="advapps-role">{a.role}</div>
 
-            <div className="text-end">
-              <Badge bg={a.status === "Completed" ? "success" : "primary"} className="mb-2">
-                {a.status}
-              </Badge>
-
-              {a.status === "Booked" && (
-                <div>
-                  <Button variant="success" onClick={() => markCompleted(a.id)}>
-                    ✅ Mark as Completed
-                  </Button>
+                <div className="advapps-meta">
+                  <div className="advapps-row">
+                    <FiCalendar className="advapps-icon" />
+                    <span>{a.date}</span>
+                  </div>
+                  <div className="advapps-row">
+                    <FiClock className="advapps-icon" />
+                    <span>{a.time}</span>
+                  </div>
+                  <div className="advapps-row">
+                    <FiMapPin className="advapps-icon" />
+                    <span>{a.location}</span>
+                  </div>
                 </div>
-              )}
-            </div>
-          </Card.Body>
-        </Card>
-      ))}
-    </>
+              </div>
+
+              {/* RIGHT */}
+              <div className="advapps-right">
+                <span className={statusClass(a.status)}>{a.status}</span>
+
+                {a.status === "Booked" && (
+                  <Button
+                    className="advapps-btn"
+                    onClick={() => markCompleted(a.id)}
+                  >
+                    <FiCheckCircle className="advapps-btn-icon" />
+                    Mark as Completed
+                  </Button>
+                )}
+              </div>
+            </Card.Body>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }

@@ -1,10 +1,14 @@
+import { Outlet } from "react-router-dom";
 import AdvisorSidebar from "../components/AdvisorSidebar";
+import "../css/AdvisorLayout.css";
 
-export default function AdvisorLayout({ children }) {
+export default function AdvisorLayout() {
   return (
-    <div className="d-flex" style={{ background: "#f6fbff" }}>
+    <div className="advisor-layout">
       <AdvisorSidebar />
-      <div style={{ flex: 1, padding: 24 }}>{children}</div>
+      <main className="advisor-content">
+        <Outlet />
+      </main>
     </div>
   );
 }
