@@ -1,7 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Row, Col, Form, Button } from "react-bootstrap";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
+import API_BASE from "../api";
 import "../css/AdvisorSlots.css";
+
+function getAdvisorId() {
+  return Number(localStorage.getItem("advisor_id")) || 1;
+}
+
+// Add 1 hour to "HH:MM"
+function addOneHour(time) {
+  if (!time || typeof time !== "string") return time;
+  const parts = time.split(":");
+  if (parts.length < 2) return time;
+
+  let h = Number(parts[0]);
+  const m = parts[1];
+
+  if (Number.isNaN(h)) return time;
+
+  h = (h + 1) % 24;
+  const hh = String(h).padStart(2, "0");
+  return `${hh}:${m}`;
+}
+
+// Map backend slot -> UI slot row
+function mapAvailableSlot(s) {
+  const start = String(s.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: s.slot_id,
+    date: String(s.slot_date), // "YYYY-MM-DD"
+    time: `${start} - ${end}`,
+    location: s.location,
+    status: s.status, // "Available"
+  };
+}
+
+// Map advisor appointment -> UI slot row (Booked/Completed/Canceled)
+function mapAppointmentToSlotRow(a) {
+  const start = String(a.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: `appt-${a.appointment_id}`, // unique in UI list
+    date: String(a.slot_date),
+    time: `${start} - ${end}`,
+    location: a.location,
+    status: a.status, // "Booked" | "Completed" | "Canceled"
+    _appointment_id: a.appointment_id,
+  };
+}
 
 export default function AdvisorSlots() {
   const [form, setForm] = useState({
@@ -11,60 +61,113 @@ export default function AdvisorSlots() {
     location: "",
   });
 
-  const [slots, setSlots] = useState([
-    {
-      id: 1,
-      date: "Wed, Jan 21, 2026",
-      time: "09:00 - 10:00",
-      location: "Office 305, Academic Building",
-      status: "Booked",
-    },
-    {
-      id: 2,
-      date: "Wed, Jan 21, 2026",
-      time: "14:00 - 15:00",
-      location: "Zoom Meeting",
-      status: "Available",
-    },
-    {
-      id: 3,
-      date: "Tue, Jan 27, 2026",
-      time: "10:00 - 11:00",
-      location: "Office 305, Academic Building",
-      status: "Available",
-    },
-  ]);
+  const [slots, setSlots] = useState([]);
+
+  // Load advisor slots (Available) + appointments (Booked/Completed/Canceled)
+  useEffect(() => {
+    const advisorId = getAdvisorId();
+
+    async function loadData() {
+      try {
+        // 1) Available slots from /slots
+        const slotsRes = await fetch(`${API_BASE}/slots?advisorId=${advisorId}`);
+        const slotsData = await slotsRes.json();
+        const available = Array.isArray(slotsData)
+          ? slotsData.map(mapAvailableSlot)
+          : [];
+
+        // 2) Advisor appointments (Booked/Completed/Canceled)
+        const apptRes = await fetch(`${API_BASE}/appointments/advisor/${advisorId}`);
+        const apptData = await apptRes.json();
+        const bookedRows = Array.isArray(apptData)
+          ? apptData.map(mapAppointmentToSlotRow)
+          : [];
+
+        // Combine for UI display
+        setSlots([...bookedRows, ...available]);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    loadData();
+  }, []);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
   }
 
-  function handleAdd(e) {
+  async function handleAdd(e) {
     e.preventDefault();
 
     if (!form.date || !form.start || !form.end || !form.location.trim()) return;
 
-    const newSlot = {
-      id: Date.now(),
-      date: form.date,
-      time: `${form.start} - ${form.end}`,
-      location: form.location,
-      status: "Available",
-    };
+    const advisorId = getAdvisorId();
 
-    setSlots((prev) => [newSlot, ...prev]);
-    setForm({ date: "", start: "", end: "", location: "" });
+    try {
+      // Backend stores one time -> we use start
+      const res = await fetch(`${API_BASE}/slots`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advisor_id: advisorId,
+          slot_date: form.date,
+          slot_time: form.start,
+          location: form.location.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // keep it simple: just log the message
+        console.log(data?.message || "Create slot failed");
+        return;
+      }
+
+      // Add new Available slot to UI (keep your time range style)
+      const newSlotRow = {
+        id: data.slot_id,
+        date: String(data.slot_date),
+        time: `${String(data.slot_time).slice(0, 5)} - ${form.end}`,
+        location: data.location,
+        status: data.status, // "Available"
+      };
+
+      setSlots((prev) => [newSlotRow, ...prev]);
+      setForm({ date: "", start: "", end: "", location: "" });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  function handleDelete(id) {
-    setSlots((prev) => prev.filter((s) => s.id !== id));
+  async function handleDelete(id) {
+    // Only real DB slots can be deleted (numeric slot_id)
+    if (typeof id === "string" && id.startsWith("appt-")) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/slots/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data?.message || "Delete failed");
+        return;
+      }
+
+      setSlots((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const statusClass = (status) => {
     if (status === "Booked") return "ms-badge-booked";
     if (status === "Available") return "ms-badge-available";
-    return "ms-badge-canceled"; // if you ever add "Canceled"
+    return "ms-badge-canceled"; // Completed/Canceled
   };
 
   return (
@@ -157,7 +260,6 @@ export default function AdvisorSlots() {
                     <span className="ms-loc">{s.location}</span>
                   </div>
 
-                  {/* ✅ Soft pill badge (matches your "needed" design) */}
                   <span className={`ms-badge ${statusClass(s.status)}`}>
                     {s.status}
                   </span>

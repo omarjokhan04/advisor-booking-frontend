@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
-//import AppNavbar from "../components/AppNavbar";
+import API_BASE from "../api";
 import "../css/Register.css";
 
 export default function Register() {
@@ -21,7 +21,7 @@ export default function Register() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -47,14 +47,44 @@ export default function Register() {
       return;
     }
 
-    // Frontend only for now
-    setSuccess("Account created (frontend only). You can login now.");
+    try {
+      // Backend register (student only)
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: form.fullName.trim(),
+          email: form.email.trim(),
+          password: form.password.trim(),
+          role: "student",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data?.message || "Registration failed.");
+        return;
+      }
+
+      setSuccess("Account created successfully. You can login now.");
+
+      // Clear form (keep it simple)
+      setForm({
+        fullName: "",
+        studentId: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.log(err);
+      setError("Server error. Please try again.");
+    }
   }
 
   return (
     <div className="register-page">
-     
-
       <main className="register-main">
         <Container className="register-container">
           <Card className="register-card">

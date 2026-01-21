@@ -1,5 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Row, Col, Form, Button, Badge } from "react-bootstrap";
+import API_BASE from "../api";
+
+function getAdvisorId() {
+  return Number(localStorage.getItem("advisor_id")) || 1;
+}
+
+function addOneHour(time) {
+  if (!time || typeof time !== "string") return time;
+  const parts = time.split(":");
+  if (parts.length < 2) return time;
+  let h = Number(parts[0]);
+  const m = parts[1];
+  if (Number.isNaN(h)) return time;
+  h = (h + 1) % 24;
+  return `${String(h).padStart(2, "0")}:${m}`;
+}
+
+// Available slots from backend
+function mapAvailableSlot(s) {
+  const start = String(s.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: s.slot_id,
+    date: String(s.slot_date), // YYYY-MM-DD
+    time: `${start} - ${end}`,
+    location: s.location,
+    status: s.status, // Available
+  };
+}
+
+// Booked/Completed/Canceled from appointments
+function mapAppointmentToSlotRow(a) {
+  const start = String(a.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: `appt-${a.appointment_id}`,
+    date: String(a.slot_date),
+    time: `${start} - ${end}`,
+    location: a.location,
+    status: a.status,
+  };
+}
 
 export default function ManageSlots() {
   const [form, setForm] = useState({
@@ -9,47 +53,95 @@ export default function ManageSlots() {
     location: "",
   });
 
-  const [slots, setSlots] = useState([
-    {
-      id: 1,
-      date: "Wed, Jan 15, 2025",
-      time: "09:00 - 10:00",
-      location: "Office 305",
-      status: "Available",
-    },
-    {
-      id: 2,
-      date: "Wed, Jan 15, 2025",
-      time: "10:00 - 10:30",
-      location: "Zoom Meeting",
-      status: "Booked",
-    },
-  ]);
+  const [slots, setSlots] = useState([]);
+
+  async function loadData() {
+    const advisorId = getAdvisorId();
+
+    try {
+      const slotsRes = await fetch(`${API_BASE}/slots?advisorId=${advisorId}`);
+      const slotsData = await slotsRes.json();
+      const available = Array.isArray(slotsData)
+        ? slotsData.map(mapAvailableSlot)
+        : [];
+
+      const apptRes = await fetch(`${API_BASE}/appointments/advisor/${advisorId}`);
+      const apptData = await apptRes.json();
+      const bookedRows = Array.isArray(apptData)
+        ? apptData.map(mapAppointmentToSlotRow)
+        : [];
+
+      setSlots([...bookedRows, ...available]);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
   }
 
-  function handleAdd(e) {
+  async function handleAdd(e) {
     e.preventDefault();
 
     if (!form.date || !form.start || !form.end || !form.location.trim()) return;
 
-    const newSlot = {
-      id: Date.now(),
-      date: form.date,
-      time: `${form.start} - ${form.end}`,
-      location: form.location,
-      status: "Available",
-    };
+    const advisorId = getAdvisorId();
 
-    setSlots((prev) => [newSlot, ...prev]);
-    setForm({ date: "", start: "", end: "", location: "" });
+    try {
+      const res = await fetch(`${API_BASE}/slots`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advisor_id: advisorId,
+          slot_date: form.date,     // YYYY-MM-DD
+          slot_time: form.start,    // HH:MM
+          location: form.location.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data?.message || "Create slot failed");
+        return;
+      }
+
+      setForm({ date: "", start: "", end: "", location: "" });
+
+      // Instructor-style: refresh from DB (no fake local state)
+      await loadData();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  function handleDelete(id) {
-    setSlots((prev) => prev.filter((s) => s.id !== id));
+  async function handleDelete(id) {
+    // prevent deleting appointment rows
+    if (typeof id === "string" && id.startsWith("appt-")) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/slots/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data?.message || "Delete failed");
+        return;
+      }
+
+      // refresh list
+      await loadData();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -68,9 +160,8 @@ export default function ManageSlots() {
               <Col md={6}>
                 <Form.Label>Date</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="date"
                   name="date"
-                  placeholder="01/20/2026"
                   value={form.date}
                   onChange={handleChange}
                 />
@@ -90,9 +181,8 @@ export default function ManageSlots() {
               <Col md={6}>
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="time"
                   name="start"
-                  placeholder="09:00 AM"
                   value={form.start}
                   onChange={handleChange}
                 />
@@ -101,9 +191,8 @@ export default function ManageSlots() {
               <Col md={6}>
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="time"
                   name="end"
-                  placeholder="10:00 AM"
                   value={form.end}
                   onChange={handleChange}
                 />
@@ -126,15 +215,25 @@ export default function ManageSlots() {
               key={s.id}
               className="border rounded p-3 mb-3 d-flex justify-content-between align-items-center"
               style={{
-                background:
-                  s.status === "Available" ? "#eafff0" : "#eaf3ff",
+                background: s.status === "Available" ? "#eafff0" : "#eaf3ff",
               }}
             >
               <div>
                 <div className="fw-bold">
                   {s.date} • {s.time} • {s.location}
                 </div>
-                <Badge bg={s.status === "Available" ? "success" : "primary"}>
+
+                <Badge
+                  bg={
+                    s.status === "Available"
+                      ? "success"
+                      : s.status === "Booked"
+                      ? "primary"
+                      : s.status === "Completed"
+                      ? "secondary"
+                      : "danger"
+                  }
+                >
                   {s.status}
                 </Badge>
               </div>
@@ -142,11 +241,14 @@ export default function ManageSlots() {
               <Button
                 variant="outline-danger"
                 onClick={() => handleDelete(s.id)}
+                disabled={typeof s.id === "string"} // appointment rows
               >
                 🗑️
               </Button>
             </div>
           ))}
+
+          {slots.length === 0 && <div className="text-muted">No slots yet.</div>}
         </Card.Body>
       </Card>
     </>
