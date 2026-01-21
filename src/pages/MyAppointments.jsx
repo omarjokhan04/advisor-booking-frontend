@@ -1,32 +1,82 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Card, Button } from "react-bootstrap";
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
+import API_BASE from "../api";
 import "../css/MyAppointments.css";
 
-export default function MyAppointments() {
-  const [appointments, setAppointments] = useState([
-    {
-      id: 10,
-      advisor: "Dr. Ahmad Saleh",
-      date: "Wed, Jan 15, 2025",
-      time: "09:00 - 10:00",
-      location: "Office 305",
-      status: "Booked",
-    },
-    {
-      id: 11,
-      advisor: "Dr. Rania Khalil",
-      date: "Fri, Jan 10, 2025",
-      time: "11:00 - 11:30",
-      location: "Zoom Meeting",
-      status: "Completed",
-    },
-  ]);
+function getStudentId() {
+  return Number(localStorage.getItem("student_id")) || 1;
+}
 
-  function cancelAppointment(id) {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Canceled" } : a))
-    );
+// add 1 hour to HH:MM
+function addOneHour(time) {
+  if (!time || typeof time !== "string") return time;
+  const parts = time.split(":");
+  if (parts.length < 2) return time;
+
+  let h = Number(parts[0]);
+  const m = parts[1];
+  if (Number.isNaN(h)) return time;
+
+  h = (h + 1) % 24;
+  return `${String(h).padStart(2, "0")}:${m}`;
+}
+
+// map backend appointment -> UI
+function mapFromBackend(a) {
+  const start = String(a.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: a.appointment_id,
+    advisor: a.advisor_name,
+    date: String(a.slot_date), // YYYY-MM-DD
+    time: `${start} - ${end}`,
+    location: a.location,
+    status: a.status,
+  };
+}
+
+export default function MyAppointments() {
+  const [appointments, setAppointments] = useState([]);
+
+  async function loadAppointments() {
+    try {
+      const studentId = getStudentId();
+      const res = await fetch(`${API_BASE}/appointments/student/${studentId}`);
+      const data = await res.json();
+
+      const mapped = Array.isArray(data) ? data.map(mapFromBackend) : [];
+      setAppointments(mapped);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  async function cancelAppointment(id) {
+    try {
+      const res = await fetch(`${API_BASE}/appointments/${id}/cancel`, {
+        method: "PUT",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data?.message || "Cancel failed");
+        return;
+      }
+
+      // update UI locally (same behavior as before)
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: "Canceled" } : a))
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -46,7 +96,7 @@ export default function MyAppointments() {
                     <h3 className="myap-advisor">{a.advisor}</h3>
                   </div>
 
-                  <span className={`status-badge ${a.status.toLowerCase()}`}>
+                  <span className={`status-badge ${String(a.status).toLowerCase()}`}>
                     {a.status}
                   </span>
                 </div>
@@ -83,6 +133,10 @@ export default function MyAppointments() {
               </Card.Body>
             </Card>
           ))}
+
+          {appointments.length === 0 && (
+            <div className="myap-empty">No appointments yet.</div>
+          )}
         </div>
       </Container>
     </div>

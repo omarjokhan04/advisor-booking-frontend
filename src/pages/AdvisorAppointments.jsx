@@ -1,48 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import { FiCheckCircle, FiCalendar, FiClock, FiMapPin } from "react-icons/fi";
+import API_BASE from "../api";
 import "../css/AdvisorAppointments.css";
 
-export default function AdvisorAppointments() {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      student: "Sara Ahmad",
-      role: "Student",
-      date: "Wednesday, January 15, 2025",
-      time: "09:00 - 10:00",
-      location: "Office 305",
-      status: "Booked",
-    },
-    {
-      id: 2,
-      student: "Omar Khaled",
-      role: "Student",
-      date: "Wednesday, January 15, 2025",
-      time: "10:00 - 10:30",
-      location: "Zoom Meeting",
-      status: "Booked",
-    },
-    {
-      id: 3,
-      student: "Lina Samir",
-      role: "Student",
-      date: "Sunday, January 12, 2025",
-      time: "12:00 - 12:30",
-      location: "Office 210",
-      status: "Canceled",
-    },
-  ]);
+function getAdvisorId() {
+  return Number(localStorage.getItem("advisor_id")) || 1;
+}
 
-  function markCompleted(id) {
-    setItems((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, status: "Completed" } : x))
-    );
+// Add 1 hour to HH:MM
+function addOneHour(time) {
+  if (!time || typeof time !== "string") return time;
+  const [h, m] = time.split(":");
+  let hour = Number(h);
+  if (Number.isNaN(hour)) return time;
+  hour = (hour + 1) % 24;
+  return `${String(hour).padStart(2, "0")}:${m}`;
+}
+
+// Map backend appointment → UI item
+function mapFromBackend(a) {
+  const start = String(a.slot_time).slice(0, 5);
+  const end = addOneHour(start);
+
+  return {
+    id: a.appointment_id,
+    student: a.student_name,
+    role: "Student",
+    date: String(a.slot_date), // YYYY-MM-DD
+    time: `${start} - ${end}`,
+    location: a.location,
+    status: a.status,
+  };
+}
+
+export default function AdvisorAppointments() {
+  const [items, setItems] = useState([]);
+
+  // Load advisor appointments
+  useEffect(() => {
+    const advisorId = getAdvisorId();
+
+    fetch(`${API_BASE}/appointments/advisor/${advisorId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const mapped = Array.isArray(data)
+          ? data.map(mapFromBackend)
+          : [];
+        setItems(mapped);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  // Mark appointment as completed (backend)
+  async function markCompleted(id) {
+    try {
+      const res = await fetch(
+        `${API_BASE}/appointments/${id}/complete`,
+        { method: "PUT" }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data?.message || "Complete failed");
+        return;
+      }
+
+      // Update UI locally (same behavior as before)
+      setItems((prev) =>
+        prev.map((x) =>
+          x.id === id ? { ...x, status: "Completed" } : x
+        )
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const statusClass = (status) => {
-    if (status === "Booked") return "advapps-status advapps-status-booked";
-    if (status === "Canceled") return "advapps-status advapps-status-canceled";
+    if (status === "Booked")
+      return "advapps-status advapps-status-booked";
+    if (status === "Canceled")
+      return "advapps-status advapps-status-canceled";
     return "advapps-status advapps-status-completed";
   };
 
@@ -80,7 +120,9 @@ export default function AdvisorAppointments() {
 
               {/* RIGHT */}
               <div className="advapps-right">
-                <span className={statusClass(a.status)}>{a.status}</span>
+                <span className={statusClass(a.status)}>
+                  {a.status}
+                </span>
 
                 {a.status === "Booked" && (
                   <Button
@@ -95,6 +137,12 @@ export default function AdvisorAppointments() {
             </Card.Body>
           </Card>
         ))}
+
+        {items.length === 0 && (
+          <div className="advapps-empty">
+            No appointments yet.
+          </div>
+        )}
       </div>
     </div>
   );

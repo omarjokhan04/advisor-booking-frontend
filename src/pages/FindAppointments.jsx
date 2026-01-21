@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Card, Alert } from "react-bootstrap";
 import SlotCard from "../components/SlotCard";
-import { availableSlots as initialSlots } from "../data/mockAppointments";
 import emailjs from "emailjs-com";
+import API_BASE from "../api";
 import "../css/FindAppointments.css";
 
 /* 🔴 PUT YOUR REAL EMAILJS IDS HERE */
@@ -15,46 +15,96 @@ function getStudentInfo() {
   return {
     name: localStorage.getItem("student_name") || "Student",
     email: localStorage.getItem("student_email") || "student@demo.com",
+    // IMPORTANT: backend booking needs student_id
+    // store it after login (recommended), fallback to 1 for now
+    id: Number(localStorage.getItem("student_id")) || 1,
+  };
+}
+
+/* Convert mm/dd/yyyy -> yyyy-mm-dd (for backend date filter) */
+function toISODate(mmddyyyy) {
+  if (!mmddyyyy) return "";
+  const parts = mmddyyyy.split("/");
+  if (parts.length !== 3) return "";
+  const [mm, dd, yyyy] = parts;
+  if (!mm || !dd || !yyyy) return "";
+  if (yyyy.length !== 4) return "";
+  const m = mm.padStart(2, "0");
+  const d = dd.padStart(2, "0");
+  return `${yyyy}-${m}-${d}`;
+}
+
+/* Map backend slot to frontend slot shape */
+function mapSlotFromBackend(s) {
+  return {
+    id: s.slot_id,
+    advisor: s.advisor_name,
+    // Keep date/time as strings for your current UI
+    date: String(s.slot_date), // "2026-01-25"
+    time: String(s.slot_time).slice(0, 5), // "10:00"
+    location: s.location,
+    status: s.status,
+    advisor_id: s.advisor_id,
   };
 }
 
 export default function FindAppointments() {
-  const [slots, setSlots] = useState(initialSlots);
-  const [myAppointments, setMyAppointments] = useState([]);
+  const [slots, setSlots] = useState([]);
+  const [myAppointments, setMyAppointments] = useState([]); // (kept as you had it)
 
   const [filters, setFilters] = useState({
-    advisor: "all",
-    date: "",
+    advisor: "all", // now holds advisor_id or "all"
+    date: "", // mm/dd/yyyy
   });
 
   const [sendingId, setSendingId] = useState(null);
   const [emailMsg, setEmailMsg] = useState({ type: "", text: "" });
+
+  // -------------------------
+  // Load advisors list from backend
+  // -------------------------
+  const [advisors, setAdvisors] = useState([{ id: "all", name: "All Advisors" }]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/users/advisors`)
+      .then((res) => res.json())
+      .then((data) => {
+        const list = [{ id: "all", name: "All Advisors" }];
+        data.forEach((a) => list.push({ id: a.user_id, name: a.full_name }));
+        setAdvisors(list);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  // -------------------------
+  // Fetch slots from backend (with filters)
+  // -------------------------
+  useEffect(() => {
+    const advisorId = filters.advisor !== "all" ? filters.advisor : "";
+    const isoDate = toISODate(filters.date);
+
+    let url = `${API_BASE}/slots`;
+    const qs = [];
+
+    if (advisorId) qs.push(`advisorId=${advisorId}`);
+    if (isoDate) qs.push(`date=${isoDate}`);
+
+    if (qs.length > 0) url += `?${qs.join("&")}`;
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        const mapped = Array.isArray(data) ? data.map(mapSlotFromBackend) : [];
+        setSlots(mapped);
+      })
+      .catch((err) => console.log(err));
+  }, [filters.advisor, filters.date]);
 
   /* handle filter change */
   function handleFilterChange(e) {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   }
-
-  /* build advisor list */
-  const advisors = ["all"];
-  slots.forEach((s) => {
-    if (!advisors.includes(s.advisor)) {
-      advisors.push(s.advisor);
-    }
-  });
-
-  /* filter slots (simple loop) */
-  const filteredSlots = slots.filter((s) => {
-    const advisorOk =
-      filters.advisor === "all" || s.advisor === filters.advisor;
-
-    const dateOk =
-      !filters.date ||
-      (typeof s.date === "string" && s.date.includes(filters.date));
-
-    return advisorOk && dateOk;
-  });
 
   /* send email */
   function sendBookingEmail(slot) {
@@ -65,7 +115,7 @@ export default function FindAppointments() {
       EMAILJS_TEMPLATE_ID,
       {
         to_name: student.name,
-        to_email: "omarjokhan2004@gmail.com",
+        to_email: student.email, // ✅ use student email (better)
         advisor_name: slot.advisor,
         date: slot.date,
         time: slot.time,
@@ -79,14 +129,37 @@ export default function FindAppointments() {
   async function handleBook(slot) {
     setEmailMsg({ type: "", text: "" });
 
-    // update UI first
-    setSlots((prev) => prev.filter((s) => s.id !== slot.id));
-    setMyAppointments((prev) => [{ ...slot, status: "Booked" }, ...prev]);
+    const student = getStudentInfo();
 
-    // send email
     try {
       setSendingId(slot.id);
+
+      // 1) Book in backend
+      const res = await fetch(`${API_BASE}/appointments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slot_id: slot.id,
+          student_id: student.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return setEmailMsg({
+          type: "danger",
+          text: data?.message || "⚠️ Booking failed.",
+        });
+      }
+
+      // 2) Update UI (same behavior as before)
+      setSlots((prev) => prev.filter((s) => s.id !== slot.id));
+      setMyAppointments((prev) => [{ ...slot, status: "Booked" }, ...prev]);
+
+      // 3) Send EmailJS confirmation (frontend-only)
       await sendBookingEmail(slot);
+
       setEmailMsg({
         type: "success",
         text: "✅ Thank you for booking! A confirmation email was sent.",
@@ -114,9 +187,7 @@ export default function FindAppointments() {
         </div>
 
         {/* EMAIL MESSAGE */}
-        {emailMsg.text && (
-          <Alert variant={emailMsg.type}>{emailMsg.text}</Alert>
-        )}
+        {emailMsg.text && <Alert variant={emailMsg.type}>{emailMsg.text}</Alert>}
 
         {/* FILTER CARD */}
         <Card className="find-filter-card">
@@ -133,8 +204,8 @@ export default function FindAppointments() {
                   className="find-input"
                 >
                   {advisors.map((a) => (
-                    <option key={a} value={a}>
-                      {a === "all" ? "All Advisors" : a}
+                    <option key={a.id} value={a.id}>
+                      {a.name}
                     </option>
                   ))}
                 </Form.Select>
@@ -150,6 +221,7 @@ export default function FindAppointments() {
                   placeholder="mm/dd/yyyy"
                   className="find-input"
                 />
+                {/* Note: backend expects YYYY-MM-DD, we convert if user types mm/dd/yyyy */}
               </Col>
             </Row>
           </Card.Body>
@@ -157,24 +229,20 @@ export default function FindAppointments() {
 
         {/* SLOTS GRID */}
         <Row className="g-4 find-grid">
-          {filteredSlots.map((slot) => (
+          {slots.map((slot) => (
             <Col md={6} lg={4} key={slot.id}>
               <SlotCard
                 slot={slot}
-                actionLabel={
-                  sendingId === slot.id ? "Sending Email..." : "Book Appointment"
-                }
+                actionLabel={sendingId === slot.id ? "Sending Email..." : "Book Appointment"}
                 onAction={handleBook}
                 disabled={sendingId === slot.id}
               />
             </Col>
           ))}
 
-          {filteredSlots.length === 0 && (
+          {slots.length === 0 && (
             <Col>
-              <div className="find-empty">
-                No appointments match your filter.
-              </div>
+              <div className="find-empty">No appointments match your filter.</div>
             </Col>
           )}
         </Row>

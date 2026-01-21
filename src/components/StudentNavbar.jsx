@@ -8,7 +8,23 @@ export default function StudentNavbar() {
   const navigate = useNavigate();
 
   function handleLogout() {
-    clearRole(); // remove role from localStorage
+    // clear role
+    clearRole();
+
+    // clear student info
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_email");
+
+    localStorage.removeItem("student_id");
+    localStorage.removeItem("student_name");
+    localStorage.removeItem("student_email");
+
+    // optional: also clear advisor info just in case
+    localStorage.removeItem("advisor_id");
+    localStorage.removeItem("advisor_name");
+    localStorage.removeItem("advisor_email");
+
     navigate("/login");
   }
 
@@ -16,7 +32,11 @@ export default function StudentNavbar() {
     <Navbar className="student-navbar" expand="md">
       <Container>
         {/* Left Brand */}
-        <Navbar.Brand as={Link} to="/student/find" className="student-navbar-brand">
+        <Navbar.Brand
+          as={Link}
+          to="/student/find"
+          className="student-navbar-brand"
+        >
           <span className="student-navbar-logo">
             <FaGraduationCap />
           </span>

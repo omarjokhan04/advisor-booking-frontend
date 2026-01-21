@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { setRole } from "../utils/auth";
-//import AppNavbar from "../components/AppNavbar";
+import API_BASE from "../api";
 import "../css/Login.css";
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
@@ -25,26 +25,61 @@ export default function Login() {
       return;
     }
 
-    // Demo login (frontend only)
-    if (form.email === "student@demo.com" && form.password === "password") {
-      setRole("student");
-      navigate("/student/find");
-      return;
-    }
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password.trim(),
+        }),
+      });
 
-    if (form.email === "advisor@demo.com" && form.password === "password") {
-      setRole("advisor");
-      navigate("/advisor/dashboard");
-      return;
-    }
+      const data = await res.json();
 
-    setError("Invalid demo credentials.");
+      if (!res.ok) {
+        setError(data?.message || "Login failed.");
+        return;
+      }
+
+      // data should include: user_id, full_name, email, role
+      const role = String(data.role || "").toLowerCase();
+
+      // Keep your existing local role behavior
+      setRole(role);
+
+      // Store common info (needed by EmailJS + pages)
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("user_name", data.full_name);
+      localStorage.setItem("user_email", data.email);
+
+      // Store role-specific ids (used in our pages)
+      if (role === "student") {
+        localStorage.setItem("student_id", data.user_id);
+        localStorage.setItem("student_name", data.full_name);
+        localStorage.setItem("student_email", data.email);
+        navigate("/student/find");
+        return;
+      }
+
+      if (role === "advisor") {
+        localStorage.setItem("advisor_id", data.user_id);
+        localStorage.setItem("advisor_name", data.full_name);
+        localStorage.setItem("advisor_email", data.email);
+        navigate("/advisor/dashboard");
+        return;
+      }
+
+      // fallback if role is unexpected
+      setError("Invalid role returned from server.");
+    } catch (err) {
+      console.log(err);
+      setError("Server error. Please try again.");
+    }
   }
 
   return (
     <div className="login-page">
-      
-
       <main className="login-main">
         <Container className="login-container">
           <Card className="login-card">
@@ -87,17 +122,7 @@ export default function Login() {
               </small>
             </div>
 
-            <div className="login-demo">
-              <strong>Demo Credentials:</strong>
-              <div className="login-demo-list">
-                <div>
-                  Student: <code>student@demo.com</code> / <code>password</code>
-                </div>
-                <div>
-                  Advisor: <code>advisor@demo.com</code> / <code>password</code>
-                </div>
-              </div>
-            </div>
+            
           </Card>
         </Container>
       </main>
