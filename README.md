@@ -1,16 +1,58 @@
-# React + Vite
+🎓 University Advisor Booking System (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for a university advisor booking system built with React and React Bootstrap.
 
-Currently, two official plugins are available:
+🎯 Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The application allows students to book appointments with university advisors, and allows advisors to manage their available slots and student appointments.
 
-## React Compiler
+The system supports two main user roles:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+👨‍🎓 Students:
+- Browse available advisor time slots
+- Filter appointments by advisor and date
+- Book an appointment
+- Receive a confirmation email after booking
 
-## Expanding the ESLint configuration
+👩‍🏫 Advisors:
+- Create and manage available time slots
+- View appointments booked by students
+- Mark appointments as completed
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is currently frontend-focused, with mock data used for appointments. Email notifications are sent using **EmailJS**.
+
+🧑‍💻 User Requirements
+
+Students:
+- View available advisor appointments
+- Filter appointments by advisor and date
+- Book an appointment
+- Receive a confirmation email after booking
+
+Advisors:
+- Add new time slots (date, time, location)
+- View all created time slots
+- View student appointments
+- Mark booked appointments as completed
+
+General:
+- Role-based navigation (Student / Advisor)
+- Clean and responsive UI
+- No backend required for core functionality
+
+🛠️ Technologies
+
+- React 18
+- React Router
+- React Bootstrap
+- React Icons
+- EmailJS (for booking confirmation emails)
+- CSS (custom styling)
+- Mock data (frontend only)
+
+🚀 Getting Started
+
+```bash
+cd advisor-booking-frontend
+npm install
+npm run dev
