@@ -1,48 +1,106 @@
-import { useMemo, useState } from "react";
-import { Container, Row, Col, Form, Card } from "react-bootstrap";
+import { useState } from "react";
+import { Container, Row, Col, Form, Card, Alert } from "react-bootstrap";
 import SlotCard from "../components/SlotCard";
 import { availableSlots as initialSlots } from "../data/mockAppointments";
+import emailjs from "emailjs-com";
 import "../css/FindAppointments.css";
+
+/* 🔴 PUT YOUR REAL EMAILJS IDS HERE */
+const EMAILJS_SERVICE_ID = "service_a72ftls";
+const EMAILJS_TEMPLATE_ID = "template_t20x6u9";
+const EMAILJS_PUBLIC_KEY = "XRhOrLD-3XOj8CMNR";
+
+/* simple student info (replace later if you add auth) */
+function getStudentInfo() {
+  return {
+    name: localStorage.getItem("student_name") || "Student",
+    email: localStorage.getItem("student_email") || "student@demo.com",
+  };
+}
 
 export default function FindAppointments() {
   const [slots, setSlots] = useState(initialSlots);
   const [myAppointments, setMyAppointments] = useState([]);
 
-  // filter UI state (frontend only for now)
   const [filters, setFilters] = useState({
     advisor: "all",
     date: "",
   });
 
-  function handleBook(slot) {
-    setSlots((prev) => prev.filter((s) => s.id !== slot.id));
-    setMyAppointments((prev) => [{ ...slot, status: "Booked" }, ...prev]);
-  }
+  const [sendingId, setSendingId] = useState(null);
+  const [emailMsg, setEmailMsg] = useState({ type: "", text: "" });
 
-  // build advisor options
-  const advisors = useMemo(() => {
-    const set = new Set(slots.map((s) => s.advisor));
-    return ["all", ...Array.from(set)];
-  }, [slots]);
-
+  /* handle filter change */
   function handleFilterChange(e) {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   }
 
-  // apply filters (simple)
-  const filteredSlots = useMemo(() => {
-    return slots.filter((s) => {
-      const advisorOk = filters.advisor === "all" || s.advisor === filters.advisor;
+  /* build advisor list */
+  const advisors = ["all"];
+  slots.forEach((s) => {
+    if (!advisors.includes(s.advisor)) {
+      advisors.push(s.advisor);
+    }
+  });
 
-      // if your slot has date like "Wed, Jan 15, 2025" we will just do contains check
-      const dateOk =
-        !filters.date ||
-        (typeof s.date === "string" && s.date.includes(filters.date));
+  /* filter slots (simple loop) */
+  const filteredSlots = slots.filter((s) => {
+    const advisorOk =
+      filters.advisor === "all" || s.advisor === filters.advisor;
 
-      return advisorOk && dateOk;
-    });
-  }, [slots, filters]);
+    const dateOk =
+      !filters.date ||
+      (typeof s.date === "string" && s.date.includes(filters.date));
+
+    return advisorOk && dateOk;
+  });
+
+  /* send email */
+  function sendBookingEmail(slot) {
+    const student = getStudentInfo();
+
+    return emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        to_name: student.name,
+        to_email: "omarjokhan2004@gmail.com",
+        advisor_name: slot.advisor,
+        date: slot.date,
+        time: slot.time,
+        location: slot.location,
+      },
+      EMAILJS_PUBLIC_KEY
+    );
+  }
+
+  /* book appointment */
+  async function handleBook(slot) {
+    setEmailMsg({ type: "", text: "" });
+
+    // update UI first
+    setSlots((prev) => prev.filter((s) => s.id !== slot.id));
+    setMyAppointments((prev) => [{ ...slot, status: "Booked" }, ...prev]);
+
+    // send email
+    try {
+      setSendingId(slot.id);
+      await sendBookingEmail(slot);
+      setEmailMsg({
+        type: "success",
+        text: "✅ Thank you for booking! A confirmation email was sent.",
+      });
+    } catch (err) {
+      console.error(err);
+      setEmailMsg({
+        type: "danger",
+        text: "⚠️ Appointment booked, but email failed to send.",
+      });
+    } finally {
+      setSendingId(null);
+    }
+  }
 
   return (
     <div className="find-page">
@@ -55,7 +113,12 @@ export default function FindAppointments() {
           </p>
         </div>
 
-        {/* FILTER BOX */}
+        {/* EMAIL MESSAGE */}
+        {emailMsg.text && (
+          <Alert variant={emailMsg.type}>{emailMsg.text}</Alert>
+        )}
+
+        {/* FILTER CARD */}
         <Card className="find-filter-card">
           <Card.Body className="find-filter-body">
             <h2 className="find-filter-title">Filter Appointments</h2>
@@ -98,8 +161,11 @@ export default function FindAppointments() {
             <Col md={6} lg={4} key={slot.id}>
               <SlotCard
                 slot={slot}
-                actionLabel="Book Appointment"
+                actionLabel={
+                  sendingId === slot.id ? "Sending Email..." : "Book Appointment"
+                }
                 onAction={handleBook}
+                disabled={sendingId === slot.id}
               />
             </Col>
           ))}
