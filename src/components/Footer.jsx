@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="footer-content">
         {/* Left */}
         <div className="footer-col">
-          <h5 className="footer-title">University Name</h5>
+          <h5 className="footer-title">Hussien Technical University</h5>
           <p className="footer-text">
             Making academic advising accessible and convenient
             <br />
