@@ -5,18 +5,17 @@ import emailjs from "emailjs-com";
 import API_BASE from "../api";
 import "../css/FindAppointments.css";
 
-/* 🔴 PUT YOUR REAL EMAILJS IDS HERE */
+
 const EMAILJS_SERVICE_ID = "service_a72ftls";
 const EMAILJS_TEMPLATE_ID = "template_t20x6u9";
 const EMAILJS_PUBLIC_KEY = "XRhOrLD-3XOj8CMNR";
 
-/* simple student info (replace later if you add auth) */
+
 function getStudentInfo() {
   return {
     name: localStorage.getItem("student_name") || "Student",
     email: localStorage.getItem("student_email") || "student@demo.com",
-    // IMPORTANT: backend booking needs student_id
-    // store it after login (recommended), fallback to 1 for now
+   
     id: Number(localStorage.getItem("student_id")) || 1,
   };
 }
@@ -50,7 +49,7 @@ function mapSlotFromBackend(s) {
 
 export default function FindAppointments() {
   const [slots, setSlots] = useState([]);
-  const [myAppointments, setMyAppointments] = useState([]); // (kept as you had it)
+  const [myAppointments, setMyAppointments] = useState([]); 
 
   const [filters, setFilters] = useState({
     advisor: "all", // now holds advisor_id or "all"
@@ -115,7 +114,7 @@ export default function FindAppointments() {
       EMAILJS_TEMPLATE_ID,
       {
         to_name: student.name,
-        to_email: student.email, // ✅ use student email (better)
+        to_email: student.email,
         advisor_name: slot.advisor,
         date: slot.date,
         time: slot.time,

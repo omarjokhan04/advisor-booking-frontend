@@ -45,7 +45,7 @@ export default function Login() {
       // data should include: user_id, full_name, email, role
       const role = String(data.role || "").toLowerCase();
 
-      // Keep your existing local role behavior
+      
       setRole(role);
 
       // Store common info (needed by EmailJS + pages)
@@ -53,7 +53,7 @@ export default function Login() {
       localStorage.setItem("user_name", data.full_name);
       localStorage.setItem("user_email", data.email);
 
-      // Store role-specific ids (used in our pages)
+      // Store role-specific ids 
       if (role === "student") {
         localStorage.setItem("student_id", data.user_id);
         localStorage.setItem("student_name", data.full_name);

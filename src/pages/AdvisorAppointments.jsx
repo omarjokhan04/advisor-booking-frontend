@@ -18,7 +18,7 @@ function addOneHour(time) {
   return `${String(hour).padStart(2, "0")}:${m}`;
 }
 
-// Map backend appointment → UI item
+// Map backend appointment to UI item
 function mapFromBackend(a) {
   const start = String(a.slot_time).slice(0, 5);
   const end = addOneHour(start);

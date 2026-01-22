@@ -24,7 +24,7 @@ function addOneHour(time) {
   return `${hh}:${m}`;
 }
 
-// Map backend slot -> UI slot row
+// Map backend slot to UI slot row
 function mapAvailableSlot(s) {
   const start = String(s.slot_time).slice(0, 5);
   const end = addOneHour(start);
@@ -38,7 +38,7 @@ function mapAvailableSlot(s) {
   };
 }
 
-// Map advisor appointment -> UI slot row (Booked/Completed/Canceled)
+// Map advisor appointment to UI slot row (Booked/Completed/Canceled)
 function mapAppointmentToSlotRow(a) {
   const start = String(a.slot_time).slice(0, 5);
   const end = addOneHour(start);
@@ -121,12 +121,12 @@ export default function AdvisorSlots() {
       const data = await res.json();
 
       if (!res.ok) {
-        // keep it simple: just log the message
+        
         console.log(data?.message || "Create slot failed");
         return;
       }
 
-      // Add new Available slot to UI (keep your time range style)
+      // Add new Available slot to UI
       const newSlotRow = {
         id: data.slot_id,
         date: String(data.slot_date),

@@ -69,7 +69,7 @@ export default function Register() {
 
       setSuccess("Account created successfully. You can login now.");
 
-      // Clear form (keep it simple)
+      // Clear form
       setForm({
         fullName: "",
         studentId: "",
