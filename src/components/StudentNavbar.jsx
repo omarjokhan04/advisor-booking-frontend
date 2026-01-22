@@ -20,7 +20,7 @@ export default function StudentNavbar() {
     localStorage.removeItem("student_name");
     localStorage.removeItem("student_email");
 
-    // optional: also clear advisor info just in case
+    // clear advisor info 
     localStorage.removeItem("advisor_id");
     localStorage.removeItem("advisor_name");
     localStorage.removeItem("advisor_email");
